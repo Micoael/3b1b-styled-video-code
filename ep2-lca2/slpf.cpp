@@ -9,6 +9,22 @@ struct Edge {
 } edge[N<<1];
 int num_edge,head[N];
 int n,m;
+
+/*
+cnt = 第二次dfs当前映射的编号
+dep(x) = x节点深度
+fa(x) = x节点父亲
+son(x) = x节点的重儿子
+size(x) = x节点的大小
+num(x) = x节点输入的原始值
+id(x) = x的第二次编号
+val(x) = x在新编号下对应的原节点
+top(x) = x节点所在链的顶端
+
+
+*/
+
+
 int cnt,dep[N],fa[N],son[N],size[N],num[N];
 int val[N],id[N],top[N];
 ll res;
