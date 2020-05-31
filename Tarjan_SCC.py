@@ -233,7 +233,7 @@ class TreeScene(Scene):
         """
         return self.tree[x-1]
 
-    def get_instance_of_edge(self,x):
+    def get_instance_of_edge(self,frm,to):
         '''
         Returns a instance of edge which you can apply methods on.
         
@@ -381,33 +381,46 @@ class IntroductionByMC(Scene):
 class TarjanAlgorithmIntro(Scene):
     pass
 
-class AlgoDemo(TreeScene):
+class TextCollection(Scene):
+    def construct(_):
+        txt = TextMobject("This node can ","$also$"," \\textbf{go back to 1} $\\rightarrow$ ")
+        txt[1].set_color(YELLOW)
+        _.play(Write(txt))
+        _.wait(5)
+        _.play(Uncreate(txt))
+        txt = TextMobject("If the node end up\\\\ with \\textbf{the same} ","$dfn$"," and ","$low$","\\\\ it has to be a root of SCC").shift(0.5*LEFT)
+        arr = TextMobject("$\\rightarrow$").shift(3*RIGHT)
+        txt[3].set_color(YELLOW)
+        txt[1].set_color(YELLOW)
+
+        _.play(Write(txt))
+        _.play(Write(arr))
+        _.wait(5)
+        _.play(Uncreate(txt),Uncreate(arr))
+        _.wait(2)
+
+
+
+class Working1(TreeScene):
 
     def construct(_):
         def prepare_for_tarjan():
             _.init()
-            _.add_edge(1,2)
-            _.add_edge(2,3)
-            _.add_edge(3,4)
-            _.add_edge(4,2)
-            _.add_edge(3,5)
-            _.add_edge(4,5)
-            _.add_edge(1,6)
-            _.add_edge(6,7)
-            _.add_edge(7,1)
-            # _.curv.append((3,4))
-            # _.curv.append((8,1))
             # _.add_edge(1,2)
-            # _.add_edge(1,6)
             # _.add_edge(2,3)
             # _.add_edge(3,4)
-            # _.add_edge(4,5)
-            # _.add_edge(5,2)
-            # _.add_edge(4,3)
+            # _.add_edge(4,2)
             # _.add_edge(3,5)
-            # _.add_edge(6,8)
-            # _.add_edge(8,1)
-            # _.add_edge(1,9)
+            # _.add_edge(4,5)
+            # _.add_edge(1,6)
+            # _.add_edge(6,7)
+            # _.add_edge(7,1)
+            _.curv.append((3,4))
+            _.curv.append((8,1))
+            _.add_edge(1,2)
+            _.add_edge(1,6)
+            _.add_edge(2,3)
+            _.add_edge(3,1)
             _.draw_tree()
             _.stele = VGroup()
             _.cnttt = 0
@@ -427,16 +440,16 @@ class AlgoDemo(TreeScene):
 
             
             _.sta.append(k)
-            _.stele.add(TextMobject(str(k)).move_to(np.array([2,_.cnttt*0.5-3,1])))
+            # _.stele.add(TextMobject(str(k)).move_to(np.array([2,_.cnttt*0.5-3,1])))
             x = TextMobject(str(k)).move_to(np.array([4,_.cnttt*0.5-3,1]))
-            _.play(Write(x))
+            _.play(FadeIn(x,direction=UP))
             _.stele.add(x)
             _.cnttt = _.cnttt+1
         
         def getot():
             k = _.sta.pop()
-            _.play(Uncreate(_.stele[len(_.stele)-1]))
-            _.stele.remove(Uncreate(_.stele[len(_.stele)-1]))
+            _.play(FadeOut(_.stele[len(_.stele)-1],direction = UP))
+            _.stele.remove(_.stele[len(_.stele)-1])
             _.cnttt=_.cnttt-1
             return k
 
@@ -449,31 +462,178 @@ class AlgoDemo(TreeScene):
             _.dfn[u] = _.timee
             _.low[u] = _.timee
             _.play(_.vgp[u].scale,(2))
-            _.vgp[u].become(TextMobject("("+str(int(_.dfn[u]))+","+str(int(_.low[u]))+")").move_to(_.get_instance_of_id(u)).scale(1))
+            _.vgp[u].become(TextMobject("(",str(int(_.dfn[u])),",",str(int(_.low[u])),")").move_to(_.get_instance_of_id(u)).scale(1))
             _.play(_.vgp[u].scale,(0.5))
             getins(u)
             i = _.head[u]
             _.vis[u]=True
             while i != int(0):
                 w = _.edg[i].to
-                
+                g = _.get_instance_of_edge(u,w)
+                expl = Arrow(_.get_instance_of_id(u).get_center(),_.get_instance_of_id(w).get_center(),color = YELLOW)
+                _.play(Write(expl))
+                _.play(Uncreate(expl))
                 if _.vis[w] == False :
+                    
                     tj(w)
+                    
+                    #_.play(_.vgp[u][3].scale,(5),_.vgp[w][3].scale,(5))
                     _.low[u] = min(_.low[u],_.low[w])
+                    #_.play(_.vgp[u][3].scale,(0.2),_.vgp[w][3].scale,(0.2))
                     _.play(FocusOn(_.get_instance_of_id(u)))
                     _.play(_.vgp[u].scale,(2))
-                    _.vgp[u].become(TextMobject("("+str(int(_.dfn[u]))+","+str(int(_.low[u]))+")").move_to(_.get_instance_of_id(u)).scale(1))
+                    _.vgp[u].become(TextMobject("(",str(int(_.dfn[u])),",",str(int(_.low[u])),")").move_to(_.get_instance_of_id(u)).scale(1))
                     _.play(_.vgp[u].scale,(0.5))
                     _.wait(1)
                 elif instk(w):
+                    
+                    #_.play(_.vgp[u][3].scale,(5),_.vgp[w][1].scale,(5))
                     _.low[u] = min(_.low[u],_.dfn[w])
+                    #_.play(_.vgp[u][3].scale,(0.2),_.vgp[w][1].scale,(0.2))
                     _.play(FocusOn(_.get_instance_of_id(u)))
                     _.play(_.vgp[u].scale,(2))
-                    _.vgp[u].become(TextMobject("("+str(int(_.dfn[u]))+","+str(int(_.low[u]))+")").move_to(_.get_instance_of_id(u)).scale(1))
+                    _.vgp[u].become(TextMobject("(",str(int(_.dfn[u])),",",str(int(_.low[u])),")").move_to(_.get_instance_of_id(u)).scale(1))
                     _.play(_.vgp[u].scale,(0.5))
                     _.wait(1)
                 i = _.edg[i].nxt
+                
+            _.play(ShowCreationThenDestruction(_.get_instance_of_id(u)))
+            
+            if(_.dfn[u]==_.low[u]):
+                v = getot()
+                print(str(v))
+                while u!=v:
+                    v = getot()
+                    print(str(v))
+                    
+                
+                print("----")
+        
+        def summon_txt():
+            _.timeers = TextMobject("0").move_to(UL*2)
+            _.play(Write(_.timeers))
+            _.vgp = VGroup()
+            for i in range((_.edgnum)) :
+               tx = TextMobject("(0,0)").move_to(_.get_instance_of_id(i)).scale(0.5)
+               _.vgp.add(tx)
+            _.play(Write(_.vgp))
+        
+        
+           
 
+        prepare_for_tarjan()
+        summon_txt()
+        Tarjan()
+        tj(1)
+        
+        _.wait(2)
+
+
+class AlgoDemo(TreeScene):
+
+    def construct(_):
+        def prepare_for_tarjan():
+            _.init()
+            # _.add_edge(1,2)
+            # _.add_edge(2,3)
+            # _.add_edge(3,4)
+            # _.add_edge(4,2)
+            # _.add_edge(3,5)
+            # _.add_edge(4,5)
+            # _.add_edge(1,6)
+            # _.add_edge(6,7)
+            # _.add_edge(7,1)
+            _.curv.append((3,4))
+            _.curv.append((8,1))
+            _.add_edge(1,2)
+            _.add_edge(1,6)
+            _.add_edge(2,3)
+            _.add_edge(3,4)
+            _.add_edge(4,5)
+            _.add_edge(5,2)
+            _.add_edge(4,3)
+            _.add_edge(3,5)
+            _.add_edge(6,8)
+            _.add_edge(8,1)
+            _.add_edge(1,9)
+            _.draw_tree()
+            _.stele = VGroup()
+            _.cnttt = 0
+        def Tarjan():
+            _.dfn = [0]*_.edgnum
+            _.low = [0]*_.edgnum
+            _.timee = 0
+            _.sta = []
+            _.clear_visit_tag()
+        
+        def instk(k):
+            for i in _.sta :
+                if(i==k) :
+                    return True
+            return False
+        def getins(k):
+
+            
+            _.sta.append(k)
+            # _.stele.add(TextMobject(str(k)).move_to(np.array([2,_.cnttt*0.5-3,1])))
+            x = TextMobject(str(k)).move_to(np.array([4,_.cnttt*0.5-3,1]))
+            _.play(FadeIn(x,direction=UP))
+            _.stele.add(x)
+            _.cnttt = _.cnttt+1
+        
+        def getot():
+            k = _.sta.pop()
+            _.play(FadeOut(_.stele[len(_.stele)-1],direction = UP))
+            _.stele.remove(_.stele[len(_.stele)-1])
+            _.cnttt=_.cnttt-1
+            return k
+
+
+        def tj(u):
+            _.play(ShowCreationThenDestructionAround(_.get_instance_of_id(u)))
+            _.timee = _.timee+1
+            _.timeers.become(TextMobject(str(_.timee)).move_to(UL*2))
+            _.wait(0.5)
+            _.dfn[u] = _.timee
+            _.low[u] = _.timee
+            _.play(_.vgp[u].scale,(2))
+            _.vgp[u].become(TextMobject("(",str(int(_.dfn[u])),",",str(int(_.low[u])),")").move_to(_.get_instance_of_id(u)).scale(1))
+            _.play(_.vgp[u].scale,(0.5))
+            getins(u)
+            i = _.head[u]
+            _.vis[u]=True
+            while i != int(0):
+                w = _.edg[i].to
+                g = _.get_instance_of_edge(u,w)
+                expl = Arrow(_.get_instance_of_id(u).get_center(),_.get_instance_of_id(w).get_center(),color = YELLOW)
+                _.play(Write(expl))
+                _.play(Uncreate(expl))
+                if _.vis[w] == False :
+                    
+                    tj(w)
+                    
+                    _.play(_.vgp[u][3].scale,(5),_.vgp[w][3].scale,(5))
+                    _.low[u] = min(_.low[u],_.low[w])
+                    _.play(_.vgp[u][3].scale,(0.2),_.vgp[w][3].scale,(0.2))
+                    _.play(FocusOn(_.get_instance_of_id(u)))
+                    _.play(_.vgp[u].scale,(2))
+                    _.vgp[u].become(TextMobject("(",str(int(_.dfn[u])),",",str(int(_.low[u])),")").move_to(_.get_instance_of_id(u)).scale(1))
+                    _.play(_.vgp[u].scale,(0.5))
+                    _.wait(1)
+                elif instk(w):
+                    
+                    _.play(_.vgp[u][3].scale,(5),_.vgp[w][1].scale,(5))
+                    _.low[u] = min(_.low[u],_.dfn[w])
+                    _.play(_.vgp[u][3].scale,(0.2),_.vgp[w][1].scale,(0.2))
+                    _.play(FocusOn(_.get_instance_of_id(u)))
+                    _.play(_.vgp[u].scale,(2))
+                    _.vgp[u].become(TextMobject("(",str(int(_.dfn[u])),",",str(int(_.low[u])),")").move_to(_.get_instance_of_id(u)).scale(1))
+                    _.play(_.vgp[u].scale,(0.5))
+                    _.wait(1)
+                i = _.edg[i].nxt
+                
+            _.play(ShowCreationThenDestruction(_.get_instance_of_id(u)))
+            
             if(_.dfn[u]==_.low[u]):
                 v = getot()
                 print(str(v))
