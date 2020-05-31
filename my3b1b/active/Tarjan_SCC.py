@@ -49,6 +49,7 @@ class TreeScene(Scene):
         self.size=[1]*self.edgnum
         self.edgeQ = [(0,0)]
         self.vis = [False]*self.edgnum
+        self.curv = [(0,0)]
 
         for i in range(self.edgnum):
             x=Edge(0,0)
@@ -188,10 +189,19 @@ class TreeScene(Scene):
         # In order to make all the arrow better, 
         # I modified Geometry.py Line 627 tip length = 0.2.
         for i in range(0,len(self.edgeQ)):
+            found = False
+            for j in range(len(self.curv)):
+                print(self.curv[j])
+                if(self.curv[j][0]==self.edgeQ[i][0] and self.curv[j][1]==self.edgeQ[i][1]):
+                    found = True
             
-            ln = CurvedArrow(self.get_instance_of_id(self.edgeQ[i][0]).get_center(),self.get_instance_of_id(self.edgeQ[i][1]).get_center(),angle=PI/6).set_submobject_colors_by_radial_gradient(inner_color=BLUE, outer_color=YELLOW)
-
+            if found:
+                ln = CurvedArrow(self.get_instance_of_id(self.edgeQ[i][0]).get_center(),self.get_instance_of_id(self.edgeQ[i][1]).get_center(),angle=PI/1.2,color=BLUE).set_sheen(0.9,UL)
+            else:
+                ln = Arrow(self.get_instance_of_id(self.edgeQ[i][0]).get_center(),self.get_instance_of_id(self.edgeQ[i][1]).get_center(),color=BLUE).set_sheen(0.9,UL)
             self.lines.add(ln)
+
+            
         
         return self.lines
 
@@ -208,7 +218,6 @@ class TreeScene(Scene):
     def highlight_edge(self,frm,to):
         """
         Focuses on an edge to stress
-
         """
         for i in range(0,len(self.sidecnt)):
             u = self.sidecnt[i][0]
@@ -221,11 +230,10 @@ class TreeScene(Scene):
     def get_instance_of_id(self,x):
         """
         Returns a instance of node which you can apply methods on.
-
         """
         return self.tree[x-1]
 
-    def get_instance_of_edge(self,x):
+    def get_instance_of_edge(self,frm,to):
         '''
         Returns a instance of edge which you can apply methods on.
         
@@ -306,7 +314,6 @@ class TreeScene(Scene):
         '''
         Update the tree on the screen, which uses the latest data to 
         reposition and rebuild the tree.
-
         '''
 
         utter = self.treeMobject.copy()
@@ -344,6 +351,8 @@ class TreeScene(Scene):
 
 class Demonstrate(TreeScene):
     def construct(_):
+        _.curv.append((3,4))
+        _.curv.append((8,1))
         _.init()
         _.add_edge(1,2)
         _.add_edge(2,3)
@@ -353,6 +362,7 @@ class Demonstrate(TreeScene):
         _.add_edge(4,3)
         _.add_edge(3,5)
         _.draw_tree()
+        
 
 
 class Starting(Scene):
@@ -361,7 +371,7 @@ class Starting(Scene):
         t_sub = TextMobject("Strongly Connect Compoment").scale(0.6)
         VG = VGroup(t,t_sub)
         VG.arrange(DOWN)
-        _.play(Write(t),Write(t_sub),run_time=5)
+        _.play(Write(t),Write(t_sub),run_timee=5)
 
 
 class IntroductionByMC(Scene):
@@ -376,6 +386,17 @@ class AlgoDemo(TreeScene):
     def construct(_):
         def prepare_for_tarjan():
             _.init()
+            # _.add_edge(1,2)
+            # _.add_edge(2,3)
+            # _.add_edge(3,4)
+            # _.add_edge(4,2)
+            # _.add_edge(3,5)
+            # _.add_edge(4,5)
+            # _.add_edge(1,6)
+            # _.add_edge(6,7)
+            # _.add_edge(7,1)
+            _.curv.append((3,4))
+            _.curv.append((8,1))
             _.add_edge(1,2)
             _.add_edge(1,6)
             _.add_edge(2,3)
@@ -388,13 +409,13 @@ class AlgoDemo(TreeScene):
             _.add_edge(8,1)
             _.add_edge(1,9)
             _.draw_tree()
-
+            _.stele = VGroup()
+            _.cnttt = 0
         def Tarjan():
             _.dfn = [0]*_.edgnum
             _.low = [0]*_.edgnum
-            _.time = 0
+            _.timee = 0
             _.sta = []
-            root = _.get_instance_of_id(1)
             _.clear_visit_tag()
         
         def instk(k):
@@ -402,33 +423,89 @@ class AlgoDemo(TreeScene):
                 if(i==k) :
                     return True
             return False
+        def getins(k):
+
+            
+            _.sta.append(k)
+            # _.stele.add(TextMobject(str(k)).move_to(np.array([2,_.cnttt*0.5-3,1])))
+            x = TextMobject(str(k)).move_to(np.array([4,_.cnttt*0.5-3,1]))
+            _.play(Write(x))
+            _.stele.add(x)
+            _.cnttt = _.cnttt+1
+        
+        def getot():
+            k = _.sta.pop()
+            _.play(Uncreate(_.stele[len(_.stele)-1]))
+            _.stele.remove(_.stele[len(_.stele)-1])
+            _.cnttt=_.cnttt-1
+            return k
+
+
         def tj(u):
-            _.time = _.time+1
-            _.dfn[u] = _.time
-            _.low[u] = _.time
-            _.sta.append(u)
+            _.play(ShowCreationThenDestructionAround(_.get_instance_of_id(u)))
+            _.timee = _.timee+1
+            _.timeers.become(TextMobject(str(_.timee)).move_to(UL*2))
+            _.wait(0.5)
+            _.dfn[u] = _.timee
+            _.low[u] = _.timee
+            _.play(_.vgp[u].scale,(2))
+            _.vgp[u].become(TextMobject("(",str(int(_.dfn[u])),",",str(int(_.low[u])),")").move_to(_.get_instance_of_id(u)).scale(1))
+            _.play(_.vgp[u].scale,(0.5))
+            getins(u)
             i = _.head[u]
             _.vis[u]=True
             while i != int(0):
                 w = _.edg[i].to
-                
+                g = _.get_instance_of_edge(u,w)
                 if _.vis[w] == False :
+                    
                     tj(w)
+                    
+                    _.play(_.vgp[u][3].scale,(2),_.vgp[w][3].scale,(2))
                     _.low[u] = min(_.low[u],_.low[w])
+                    _.play(g.color,BLUE,_.vgp[u][3].scale,(0.5),_.vgp[w][3].scale,(0.5))
+                    _.play(FocusOn(_.get_instance_of_id(u)))
+                    _.play(_.vgp[u].scale,(2))
+                    _.vgp[u].become(TextMobject("(",str(int(_.dfn[u])),",",str(int(_.low[u])),")").move_to(_.get_instance_of_id(u)).scale(1))
+                    _.play(_.vgp[u].scale,(0.5))
+                    _.wait(1)
                 elif instk(w):
+                    
+                    _.play(_.vgp[u][3].scale,(2),_.vgp[w][1].scale,(2))
                     _.low[u] = min(_.low[u],_.dfn[w])
+                    _.play(g.color,BLUE,_.vgp[u][3].scale,(0.5),_.vgp[w][1].scale,(0.5))
+                    _.play(FocusOn(_.get_instance_of_id(u)))
+                    _.play(_.vgp[u].scale,(2))
+                    _.vgp[u].become(TextMobject("(",str(int(_.dfn[u])),",",str(int(_.low[u])),")").move_to(_.get_instance_of_id(u)).scale(1))
+                    _.play(_.vgp[u].scale,(0.5))
+                    _.wait(1)
                 i = _.edg[i].nxt
 
             if(_.dfn[u]==_.low[u]):
-                v = _.sta.pop()
+                v = getot()
                 print(str(v))
                 while u!=v:
-                    v = _.sta.pop()
+                    v = getot()
                     print(str(v))
                     
                 
                 print("----")
+        
+        def summon_txt():
+            _.timeers = TextMobject("0").move_to(UL*2)
+            _.play(Write(_.timeers))
+            _.vgp = VGroup()
+            for i in range((_.edgnum)) :
+               tx = TextMobject("(0,0)").move_to(_.get_instance_of_id(i)).scale(0.5)
+               _.vgp.add(tx)
+            _.play(Write(_.vgp))
+        
+        
+           
 
         prepare_for_tarjan()
+        summon_txt()
         Tarjan()
         tj(1)
+        
+        _.wait(2)
