@@ -40,10 +40,12 @@ class Message_box(VGroup):
         'texes': "This is a sample text with formula $\\sum_{d | m}\\mu(d) g (m/d)$",
         'dire': True,
         'avatar':"D:\\music\\dialog\\mp.png",
-        'UL':"D:\\3b1b\\manim\\assets\\svg_images\\blank.png",
-        'UR':'D:\\3b1b\\manim\\assets\\svg_images\\UR3.png',
-        'DL':"D:\\3b1b\\manim\\assets\\svg_images\\blank.png",
-        'DR':"D:\\3b1b\\manim\\assets\\svg_images\\blank.png"
+        'txt_col': BLACK,
+        'extra_buff': 0.0,
+        'UL':"blank.png",
+        'UR':'UR3.png',
+        'DL':"blank.png",
+        'DR':"blank.png"
     }
     
     def __init__(_,direction,Bubble,Bar,**kwargs):
@@ -57,17 +59,17 @@ class Message_box(VGroup):
         _.vcirc = Shadow_around(Circle(radius = avatar.get_width()/2-0.2).move_to(avatar.get_center())).shift(0.03*DOWN)
         vcirc = _.vcirc
         if(direction ):
-            _.text = TextMobject(texes,plot_depth=99999,color = BLACK,font="Segoe UI Emoji").next_to(avatar,LEFT,aligned_edge = DOWN).scale(0.5,about_point=avatar.get_center()+avatar.get_width()/2*LEFT).shift(0.25*UP)
+            _.text = TextMobject(texes,plot_depth=99999,color = _.txt_col,font="Segoe UI Emoji").next_to(avatar,LEFT,aligned_edge = DOWN).scale(0.5,about_point=avatar.get_center()+avatar.get_width()/2*LEFT).shift(0.25*UP)
         else:
-            _.text = TextMobject(texes,plot_depth=99999,color = BLACK,font="Segoe UI Emoji").next_to(avatar,aligned_edge = DOWN).scale(0.5,about_point=avatar.get_center()+avatar.get_width()/2*RIGHT).shift(0.25*UP)
+            _.text = TextMobject(texes,plot_depth=99999,color = _.txt_col,font="Segoe UI Emoji").next_to(avatar,aligned_edge = DOWN).scale(0.5,about_point=avatar.get_center()+avatar.get_width()/2*RIGHT).shift(0.25*UP)
         text = _.text
         person_id = Text(id_text,color = BLACK,font="思源宋体 CN").scale(0.3)
         person_id.next_to(avatar,UP,buff = -0.1)
-        print(text.get_width())
+        # print(text.get_width())
         w = text.get_width()
         h = text.get_height()   
         # _.background = RoundedRectangle(corner_radius = 0.2,height = text.get_height()+buff,width =text.get_width()+buff,fill_opacity = 1.0,color=col,stroke_color = GREEN,stroke_opacity =0.0).move_to(text.get_center())
-        _.background = Bubble.move_to(text.get_center()).set_height(text.get_height()+buff,stretch=True).set_width(text.get_width()+buff,stretch=True)
+        _.background = Bubble.move_to(text.get_center()).set_height(text.get_height()+buff+_.extra_buff,stretch=True).set_width(text.get_width()+buff,stretch=True)
         if(direction):
             _.ll = RIGHT
             _.rr = LEFT
@@ -104,6 +106,11 @@ class MsgAnimation(Animation):
     def __init__(_, msg, **kwargs):
         super().__init__(msg, **kwargs)
 
+class Person():
+    def __init__(_,name,avatar,style):
+        _.name = name
+        _.avatar = avatar
+        _.style = style
 
 
 class MsgScene(Scene):
@@ -143,18 +150,53 @@ class MsgScene(Scene):
                     "并非证明有爱之后才去和\\texttt{ Hiiro }结婚",
                     "是为了证明自己的爱而和\\texttt{ Hiiro }结婚",
                     ]
-        # 聊天者ID
-        _.id = ["junble2"]*50
+        # Person
+        _.personList = [
+            Person("沃威莎*辣么帅","Person1.png",0),
+            Person("ViVi","Person2.png",0),
+            Person("命中有运里无","Person3.png",2),
+            Person("W Tse","Person3.png",0),
+            Person("小咸鱼","Person3.png",9),
+            Person("三文鱼爱吃猫耳朵","Person3.png",0),
+            Person("缘家喵","Person3.png",1),
+            Person("Petris白繁","Person3.png",0),
+            Person("debu猫猫可爱想摸耳朵","Person3.png",0),
+            Person("黑白猪","Person3.png",0),
+            Person("(打工人) 暗中观察扎比子","Person3.png",3),
+            Person("蓝空26","Person3.png",0),
+            Person("Lysine","Person3.png",10),
+            Person("流之流FlowingS","Person3.png",10),
+            Person("只是爱过","Person3.png",0),
+            Person("(正在尝试做mod)沙耶","Person3.png",0),
+            Person("(女粉)Hirro的女粉第8848号","Person3.png",0),
+            Person("Hiiro一虚拟猫咪","Person3.png",0),
+            Person("黄铜上低音空艇","Person3.png",4),
+            Person("冰糖Sherry水","Person3.png",0),
+            Person("(剪辑) 铁狐","Person3.png",0),
+            Person("Yukio","Person3.png",5),
+            Person("巡音LUKA","Person3.png",6),
+            Person("hiiro的尾巴","Person3.png",7),
+            Person("夜幕水歌","Person3.png",8),
+            Person("caft","Person3.png",10),
+            Person("星落","Person3.png",0),
+            Person("Fifth_J","Person3.png",10),
+            Person("xiyangQAQ","Person3.png",10),
+            Person("TANI","Person3.png",0),
+            Person("Takuko_FBI","Person3.png",0),
+        ]
+        _.person = [_.personList[i] for i in 
+            [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29,30,30]
+        ]
+        
         # 飞入方向
         _.dir = [0]*50
-        # 头像
-        _.img = ["D:\\music\\dialog\\"+i+".png" for i in _.id]
-        # 颜色
-        _.clrs = [GREEN,BLUE,GOLD]
+        # # 头像
+        # _.img = ["D:\\music\\dialog\\"+i+".png" for i in _.id]
+        # # 颜色
+        _.clrs = [WHITE,WHITE,WHITE]
         # 表情(偏移量,表情图片)
         _.emoji = [[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[],[]]
-        # 装饰
-        _.style = [0]*50
+        
 
     def get_bubble(_,i,col):
         if i==1:
@@ -201,6 +243,10 @@ class MsgScene(Scene):
             t[2].set_color("#fff5de")
             t[3].set_color("#b3b68b")
             return t
+        elif i==9:
+            return RoundedRectangle(corner_radius = 0.2,plot_depth=5,fill_opacity=1.0,stroke_color=col).set_color(["#C3E1F8","#ACD3EF"]).set_sheen_direction(DOWN)
+        elif i==10:
+            return RoundedRectangle(corner_radius = 0.2,plot_depth=5,fill_opacity=1.0,stroke_color=col).set_color(["#C3E1F8","#ACD3EF"]).set_sheen_direction(DOWN)
         else:
             return RoundedRectangle(corner_radius = 0.2,fill_color=col,plot_depth=5,fill_opacity=1.0,stroke_color=col)
 
@@ -215,15 +261,34 @@ class MsgScene(Scene):
             return SVGMobject("bubble.svg",plot_depth=0,color=col,fill_color=col,fill_opacity=1.0,stroke_color=col).scale(0.5)
 
     def init(_):
+        _.decos=[
+            ["blank","blank","blank","blank"],
+            ["blank","blank","blank","blank"],
+            ["UL1","UR1","DL1","DR1"],
+            ["UL4","blank","blank","DR4"],
+            ["blank","blank","blank","DR6"],
+            ["blank","blank","blank","blank"],
+            ["blank","blank","blank","DR8"],
+            ["blank","blank","blank","blank"],
+            ["UL10","UR10","DL10","DR10"],
+            ["blank","blank","blank","DR2"],
+            ["blank","DR5","DL5","blank"]
+            ]
+        _.txtcol=[BLACK, BLACK, WHITE, WHITE,WHITE,BLACK,BLACK,WHITE,WHITE,BLACK,BLACK]
+        _.buff=[0, 0, 0, 0,1.8,0,0,0,0,0,0]
+        _.id = [_.person[i].name for i in range(len(_.texts))]
+        _.style = [_.person[i].style for i in range(len(_.texts))]
+        _.img = [_.person[i].avatar for i in range(len(_.texts))]
         
         _.cd = []
         for i in range(len(_.texts)):
             if _.dir[i] == 0:
-                print("Left")
-                _.cd.append(Message_box(0,_.get_bubble(_.style[i],_.clrs[i%3]),_.get_bar(_.style[i],_.clrs[i%3]),texes = _.texts[i],id_text=_.id[i]))
+                # print("Left")
+                _.cd.append(Message_box(0,_.get_bubble(_.style[i],_.clrs[i%3]),_.get_bar(_.style[i],_.clrs[i%3]),texes = _.texts[i],txt_col = _.txtcol[_.style[i]],id_text=_.id[i],UL=_.decos[_.style[i]][0],UR=_.decos[_.style[i]][1],DL=_.decos[_.style[i]][2],DR=_.decos[_.style[i]][3]))
             else:
-                print("Right")
+                # print("Right")
                 _.cd.append(Message_box(1,_.get_bubble(_.style[i],_.clrs[i%3]),_.get_bar(_.style[i],_.clrs[i%3]),texes = _.texts[i],id_text=_.id[i]))
+
 
         _.mob = [i.get_mobs() for i in _.cd ]
         _.txt = [i.get_txt() for i in _.cd ]
@@ -246,7 +311,6 @@ class MsgScene(Scene):
         _.DLs = [ImageMobject(_.cd[i].DL,plot_depth=999).move_to(_.txt[i].get_center()+(_.txt[i].get_height()/2+_.cd[i].buffe/2)*DOWN+_.txt[i].get_width()/2*_.ll).scale(0.2) for i in range(len(_.cd))  ]
         _.DRs = [ImageMobject(_.cd[i].DR,plot_depth=999).move_to(_.txt[i].get_center()+(_.txt[i].get_height()/2+_.cd[i].buffe/2)*DOWN-_.txt[i].get_width()/2*_.ll).scale(0.2) for i in range(len(_.cd)) ]
         _.VG = VGroup()
-    
            
 
     def anime(_,i):
@@ -255,8 +319,8 @@ class MsgScene(Scene):
             obj.become(ImageMobject(_.img[i]).move_to(_.vc[i].get_center()).set_width(_.vc[i].get_width()))
         _.ava[i].add_updater(update)
         _.play(_.VG.shift,1.5*UP,GrowFromPoint(_.mob[i],_.cd[i].get_starting_point()),FadeIn(_.ava[i]))
-        emo = [ImageMobject("D:\\3b1b\\manim\\assets\\svg_images\\"+j[1]+".png",plot_depth=999999).move_to(_.mob[i]).shift(j[0]*LEFT).scale(0.3) for j in _.emoji[i] ]
-        print(emo)
+        emo = [ImageMobject(""+j[1]+".png",plot_depth=999999).move_to(_.mob[i]).shift(j[0]*LEFT).scale(0.3) for j in _.emoji[i] ]
+        # print(emo)
         if(len(emo)>0):
             _.play(Write(_.txt[i]),FadeIn(_.ULs[i]),FadeIn(_.URs[i]),FadeIn(_.DLs[i]),FadeIn(_.DRs[i]),run_time = 0.5)
         else:
@@ -283,10 +347,10 @@ class MsgScene(Scene):
     def construct(_):
         _.feed_data()
         _.init()
+        # _.anime(22)
         for i in range(len(_.cd)):
             _.anime(i)
             _.wait(1)
-        # _.anime(1)
         # _.anime(2)
-        # _.anime(3)
-        # _.add(_.get_bubble(9,GRAY))
+        # _.anime(2)
+        # _.add(_.get_bubble(6,GRAY))
